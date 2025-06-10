@@ -1,0 +1,60 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+
+# Sample movie data (replace with your dataset)
+data = {
+    'Title': ['Movie A', 'Movie B', 'Movie C', 'Movie D', 'Movie E'],
+    'Genre': ['Action', 'Comedy', 'Drama', 'Action', 'Comedy'],
+    'Director': ['Director X', 'Director Y', 'Director Z', 'Director X', 'Director Y'],
+    'Actor1': ['Actor A', 'Actor B', 'Actor C', 'Actor A', 'Actor B'],
+    'Actor2': ['Actor D', 'Actor E', 'Actor F', 'Actor D', 'Actor E'],
+    'Rating': [7.5, 6.8, 8.2, 7.0, 6.5]
+}
+
+df = pd.DataFrame(data)
+
+# Preprocessing
+# Encode categorical features
+label_encoders = {}
+for column in ['Genre', 'Director', 'Actor1', 'Actor2']:
+    le = LabelEncoder()
+    df[column] = le.fit_transform(df[column])
+    label_encoders[column] = le  # Store for later use (e.g., prediction)
+
+# Features and target
+features = ['Genre', 'Director', 'Actor1', 'Actor2']
+target = 'Rating'
+
+# Split data
+X_train, X_val, y_train, y_val = train_test_split(df[features], df[target], test_size=0.2, random_state=42)
+
+# Model training
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Prediction
+y_pred = model.predict(X_val)
+
+# Evaluation
+mse = mean_squared_error(y_val, y_pred)
+rmse = np.sqrt(mse)
+print(f'Root Mean Squared Error: {rmse:.2f}')
+
+# Example prediction (using the trained model and label encoders)
+new_movie = pd.DataFrame({
+    'Genre': ['Comedy'],
+    'Director': ['Director Y'],
+    'Actor1': ['Actor B'],
+    'Actor2': ['Actor E']
+})
+
+# Encode the new movie's features
+for column in ['Genre', 'Director', 'Actor1', 'Actor2']:
+    new_movie[column] = label_encoders[column].transform(new_movie[column])
+
+predicted_rating = model.predict(new_movie[features])[0]
+print(f'Predicted rating for the new movie: {predicted_rating:.2f}')
