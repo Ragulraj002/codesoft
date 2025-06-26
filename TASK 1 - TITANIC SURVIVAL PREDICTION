@@ -19,7 +19,7 @@ PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
 10,1,2,"Nasser, Mrs. Nicholas (Adele Achem)",female,14.0,1,0,237736,30.0708,,C
 """
 
-# Load the data from the string
+
 data = pd.read_csv(StringIO(csv_data))
 
 # Preprocess the data
@@ -28,14 +28,14 @@ data['Embarked'] = data['Embarked'].fillna('S')
 data['Embarked'] = data['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
 data['Age'] = data['Age'].fillna(data['Age'].median())
 
-# Select features and target
+
 features = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
 target = 'Survived'
 
-# Split data into training and validation sets
+
 X_train, X_val, y_train, y_val = train_test_split(data[features], data[target], test_size=0.2, random_state=42)
 
-# Initialize and train the Random Forest model
+
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
